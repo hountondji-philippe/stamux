@@ -1,10 +1,7 @@
 <?php
-
 namespace App\Http\Resources;
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
 class PermissionResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -12,7 +9,8 @@ class PermissionResource extends JsonResource
         return [
             'id' => $this->id,
             'intern' => new UserResource($this->whenLoaded('intern')),
-            'date' => $this->date->toDateString(),
+            'start_date' => $this->start_date->toDateString(),
+            'end_date' => $this->end_date->toDateString(),
             'reason' => $this->reason,
             'status' => $this->status->value,
             'mentor_comment' => $this->mentor_comment,

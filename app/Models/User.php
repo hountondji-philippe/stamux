@@ -7,6 +7,7 @@ use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -28,12 +29,26 @@ class User extends Authenticatable
         'role',
         'status',
         'avatar_path',
+        'phone',
+        'phone',
+        'phone',
         'mfa_enabled',
         'mfa_secret',
         'consent_accepted_at',
         'invitation_token',
         'invitation_token_expires_at',
         'invitation_accepted_at',
+        'notify_email',
+        'notify_push',
+        'notify_attendance_reminder',
+        'theme',
+        'bio',
+        'company',
+        'department',
+        'availability',
+        'max_capacity',
+        'admin_rating',
+        'admin_rating_comment',
     ];
 
     protected $hidden = [
@@ -51,6 +66,10 @@ class User extends Authenticatable
             'role' => UserRole::class,
             'status' => UserStatus::class,
             'mfa_enabled' => 'boolean',
+            'notify_email' => 'boolean',
+            'notify_push' => 'boolean',
+            'notify_attendance_reminder' => 'boolean',
+            'availability' => 'boolean',
             'consent_accepted_at' => 'datetime',
             'invitation_token_expires_at' => 'datetime',
             'invitation_accepted_at' => 'datetime',
@@ -60,6 +79,13 @@ class User extends Authenticatable
     public function internshipAsIntern(): HasMany
     {
         return $this->hasMany(Internship::class, 'intern_id');
+    }
+
+    public function activeInternshipAsIntern(): HasOne
+    {
+        return $this->hasOne(Internship::class, 'intern_id')
+            ->where('status', 'active')
+            ->latestOfMany();
     }
 
     public function internsAsMentor(): HasMany

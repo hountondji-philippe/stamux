@@ -48,7 +48,7 @@ class ProjectController extends Controller
         $user = auth()->user();
 
         $projects = $user->isAdmin()
-            ? $this->projects->byMentor('')
+            ? $this->projects->all()
             : ($user->isMentor()
                 ? $this->projects->byMentor($user->id)
                 : $this->projects->forIntern($user->id));

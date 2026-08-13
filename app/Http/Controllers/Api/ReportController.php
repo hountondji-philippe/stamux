@@ -143,7 +143,7 @@ class ReportController extends Controller
 
         Gate::authorize('delete', $report);
 
-        $this->hideReportAction->execute($report);
+        $this->hideReportAction->execute($report, auth()->user());
 
         return response()->json([
             'success' => true,

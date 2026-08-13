@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
         $middleware->validateCsrfTokens(except: ['api/*']);
         $middleware->append(SecurityHeaders::class);
         $middleware->append(AuditLog::class);
@@ -94,12 +93,26 @@ return Application::configure(basePath: dirname(__DIR__))
                 'error' => ['code' => 'UNAUTHORIZED', 'message' => 'Action non autorisée.'],
             ], 403);
         });
-        
-        
+
+
         $exceptions->render(function (\App\Exceptions\PermissionAlreadyReviewedException $e) {
             return response()->json([
                 'success' => false,
                 'error' => ['code' => 'PERMISSION_ALREADY_REVIEWED', 'message' => $e->getMessage()],
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Exceptions\OverlappingPermissionException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'OVERLAPPING_PERMISSION', 'message' => $e->getMessage()],
+            ], 422);
+        });
+
+        $exceptions->render(function (\App\Exceptions\DocumentAlreadyRequestedException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_ALREADY_REQUESTED', 'message' => $e->getMessage()],
             ], 422);
         });
 

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\AdminAuditLogController;
 use App\Http\Controllers\Api\Admin\AdminInternshipController;
 use App\Http\Controllers\Api\Admin\AdminStatsController;
+use App\Http\Controllers\Api\Admin\RolePermissionController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -31,6 +32,7 @@ Route::prefix('v1')->group(function () {
 
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
+        Route::get('settings', [\App\Http\Controllers\Api\Admin\PlatformSettingsController::class, 'show']);
         Route::prefix('me')->controller(MeController::class)->group(function () {
             Route::get('/', 'show');
             Route::patch('/', 'update');
@@ -38,18 +40,37 @@ Route::prefix('v1')->group(function () {
             Route::post('mfa', 'enableMfa');
             Route::patch('mfa/secret', 'updateMfaSecret');
             Route::get('notifications', 'notifications');
+            Route::get('profile-overview', 'profileOverview');
+            Route::patch('notifications/{id}/read', 'markOneNotificationRead');
+            Route::delete('notifications/{id}', 'deleteOneNotification');
+            Route::delete('notifications', 'deleteAllNotifications');
             Route::post('notifications/read', 'markNotificationsRead');
             Route::get('data-export', 'dataExport');
+            Route::patch('password', 'updatePassword');
         });
+
+        Route::prefix('messaging')->controller(\App\Http\Controllers\MessagingController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::get('unread-count', 'unreadCount');
+            Route::post('start', 'start');
+            Route::get('{conversation}/messages', 'messages');
+            Route::post('{conversation}/messages', 'store');
+            Route::post('{conversation}/read', 'markRead');
+        });
+
+        Route::get('directory', [\App\Http\Controllers\Api\DirectoryController::class, 'index']);
+
 
         Route::prefix('feedback')->controller(InternshipFeedbackController::class)->group(function () {
             Route::post('/', 'store');
         });
         
         Route::prefix('internships')->controller(InternshipController::class)->group(function () {
+            Route::get('mentor-overview', 'mentorOverview');
             Route::post('/', 'store');
             Route::get('/', 'index');
             Route::get('{id}', 'show');
+            Route::get('{id}/projects-overview', 'internProjectsOverview');
             Route::post('{id}/terminate', 'terminate');
         });
 
@@ -111,8 +132,10 @@ Route::prefix('v1')->group(function () {
     Route::post('{id}/upload', 'upload');
     Route::post('{id}/reject', 'reject');
     Route::get('{id}/download', 'download');
+    Route::get('{id}/download-file', 'downloadFile');
+    Route::patch('{id}', 'update');
+    Route::delete('{id}', 'destroy');
 });
-     
 
         Route::prefix('events')->controller(EventController::class)->group(function () {
             Route::post('/', 'store');
@@ -123,8 +146,15 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('admin')->group(function () {
+            Route::prefix('settings')->controller(\App\Http\Controllers\Api\Admin\PlatformSettingsController::class)->group(function () {
+                Route::patch('/', 'update');
+                Route::post('logo', 'uploadLogo');
+                Route::post('favicon', 'uploadFavicon');
+            });
             Route::prefix('users')->controller(AdminUserController::class)->group(function () {
                 Route::get('/', 'index');
+                Route::get('{id}/overview', 'overview');
+                Route::patch('{id}/rate', 'rate');
                 Route::post('/', 'store');
                 Route::get('{id}', 'show');
                 Route::patch('{id}', 'update');
@@ -156,6 +186,12 @@ Route::prefix('v1')->group(function () {
                 Route::get('reports', 'reports');
                 Route::get('documents', 'documents');
             });
+
+            Route::prefix('role-permissions')->controller(RolePermissionController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::patch('{id}', 'update');
+            });
+
         });
     });
 });

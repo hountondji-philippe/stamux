@@ -14,6 +14,7 @@ interface ProjectRepositoryInterface
     public function update(Project $project, array $data): Project;
 
     public function byMentor(string $mentorId): Collection;
+    public function all(): Collection;
 
     public function forIntern(string $internId): Collection;
 }

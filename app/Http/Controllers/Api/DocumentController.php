@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Document\AdminProcessDocumentAction;
+use App\Actions\Document\DeleteRejectedDocumentAction;
+use App\Actions\Document\EditRejectedDocumentAction;
 use App\Actions\Document\GetSecureDocumentUrlAction;
 use App\Actions\Document\MentorValidateDocumentAction;
 use App\Actions\Document\RequestDocumentAction;
@@ -16,6 +18,7 @@ use App\Http\Resources\DocumentResource;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\InternshipRepositoryInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class DocumentController extends Controller
@@ -25,6 +28,8 @@ class DocumentController extends Controller
         private MentorValidateDocumentAction $mentorValidateAction,
         private AdminProcessDocumentAction $adminProcessAction,
         private GetSecureDocumentUrlAction $getSecureUrlAction,
+        private DeleteRejectedDocumentAction $deleteRejectedAction,
+        private EditRejectedDocumentAction $editRejectedAction,
         private DocumentRepositoryInterface $documents,
         private InternshipRepositoryInterface $internships,
     ) {
@@ -146,6 +151,24 @@ class DocumentController extends Controller
         ]);
     }
 
+    public function downloadFile(string $id)
+    {
+        $document = $this->documents->find($id);
+
+        Gate::authorize('download', $document);
+
+        if ($document->status !== \App\Enums\DocumentStatus::Completed || ! $document->file_path) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_READY', 'message' => 'Ce document n\'est pas encore disponible.'],
+            ], 422);
+        }
+
+        $filename = $document->type->value . '-' . $document->document_number . '.pdf';
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($document->file_path, $filename);
+    }
+
     public function download(string $id): JsonResponse
     {
         $document = $this->documents->find($id);
@@ -157,6 +180,52 @@ class DocumentController extends Controller
         return response()->json([
             'success' => true,
             'data' => ['url' => $url],
+        ]);
+    }
+
+    public function destroy(string $id): JsonResponse
+    {
+        $document = $this->documents->find($id);
+
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
+
+        $this->deleteRejectedAction->execute($document, auth()->user());
+
+        return response()->json([
+            'success' => true,
+            'data' => ['message' => 'Demande supprimée avec succès.'],
+        ]);
+    }
+
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $document = $this->documents->find($id);
+
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'request_note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $updated = $this->editRejectedAction->execute(
+            $document,
+            auth()->user(),
+            $validated['request_note'] ?? null
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => new DocumentResource($updated),
         ]);
     }
 }

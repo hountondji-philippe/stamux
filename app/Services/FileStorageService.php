@@ -25,6 +25,23 @@ class FileStorageService
         return $file->storeAs($folder, $filename, 'local');
     }
 
+    public function storePublic(UploadedFile $file, string $folder): string
+    {
+        $this->validateFile($file);
+        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
+        return $file->storeAs($folder, $filename, 'public');
+    }
+
+    public function publicUrl(string $path): string
+    {
+        return Storage::disk('public')->url($path);
+    }
+
+    public function deletePublic(string $path): bool
+    {
+        return Storage::disk('public')->delete($path);
+    }
+
     public function temporaryUrl(string $path, int $minutes = 15): string
     {
         if (! Storage::disk('local')->exists($path)) {

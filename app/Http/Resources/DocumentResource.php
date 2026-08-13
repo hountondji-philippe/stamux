@@ -21,7 +21,7 @@ class DocumentResource extends JsonResource
             'reviewed_by' => new UserResource($this->whenLoaded('reviewedBy')),
             'reviewed_at' => $this->reviewed_at?->toIso8601String(),
             'generated_at' => $this->generated_at?->toIso8601String(),
-            'is_downloadable' => $this->status->value === 'generated',
+            'is_downloadable' => $this->status->value === 'completed',
         ];
     }
 }

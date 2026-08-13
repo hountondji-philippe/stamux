@@ -21,16 +21,18 @@ class ProjectResource extends JsonResource
             'end_date' => $this->end_date?->toDateString(),
             'status' => $this->status->value,
             'tasks_count' => $this->whenCounted('tasks'),
-            'interns' => UserResource::collection($this->whenLoaded('interns'))
-                ->map(function ($intern, $index) {
-                    $pivot = $this->interns[$index]->pivot ?? null;
-
-                    return array_merge($intern->resolve(), [
-                        'evaluation_score' => $pivot?->evaluation_score,
-                        'evaluation_comment' => $pivot?->evaluation_comment,
-                        'assigned_at' => $pivot?->assigned_at?->toIso8601String(),
-                    ]);
-                }),
+            'interns' => $this->whenLoaded('interns', function () {
+                return $this->interns->map(function ($intern) {
+                    return [
+                        'id' => $intern->id,
+                        'name' => $intern->name,
+                        'email' => $intern->email,
+                        'evaluation_score' => $intern->pivot->evaluation_score ?? null,
+                        'evaluation_comment' => $intern->pivot->evaluation_comment ?? null,
+                        'assigned_at' => $intern->pivot->assigned_at?->toIso8601String(),
+                    ];
+                });
+            }),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

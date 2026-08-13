@@ -5,7 +5,8 @@ namespace App\Actions\Document;
 use App\Enums\DocumentStatus;
 use App\Enums\UserRole;
 use App\Models\Document;
-use App\Notifications\DocumentRequestedNotification;
+use App\Notifications\DocumentMentorApprovedNotification;
+use App\Notifications\DocumentRejectedNotification;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 
@@ -25,10 +26,12 @@ class MentorValidateDocumentAction
             'mentor_validated_at' => now(),
         ]);
 
+        $updated->loadMissing('intern');
+
         $admins = $this->users->paginate(100, ['role' => UserRole::Admin->value]);
 
         foreach ($admins as $admin) {
-            $admin->notify(new DocumentRequestedNotification($updated));
+            $admin->notify(new DocumentMentorApprovedNotification($updated));
         }
 
         return $updated;
@@ -36,11 +39,16 @@ class MentorValidateDocumentAction
 
     public function reject(Document $document, string $mentorId, string $reason): Document
     {
-        return $this->documents->update($document, [
+        $updated = $this->documents->update($document, [
             'status' => DocumentStatus::MentorRejected->value,
             'mentor_id' => $mentorId,
             'mentor_validated_at' => now(),
             'rejection_reason' => $reason,
         ]);
+
+        $updated->loadMissing('intern');
+        $updated->intern->notify(new DocumentRejectedNotification($updated, 'mentor'));
+
+        return $updated;
     }
 }

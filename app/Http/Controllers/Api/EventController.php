@@ -12,6 +12,8 @@ use App\Repositories\Contracts\EventRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -26,8 +28,16 @@ class EventController extends Controller
     {
         Gate::authorize('publish', \App\Models\Event::class);
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $imagePath = $file->storeAs('events', $filename, 'public');
+        }
+
         $data = PublishEventData::fromArray(array_merge($request->validated(), [
             'author_id' => auth()->id(),
+            'image_path' => $imagePath,
         ]));
 
         $event = $this->publishEventAction->execute($data);
@@ -74,7 +84,23 @@ class EventController extends Controller
             'content' => ['sometimes', 'string', 'max:5000'],
             'audience' => ['sometimes', \Illuminate\Validation\Rule::enum(\App\Enums\EventAudience::class)],
             'is_pinned' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:8192'],
+            'remove_image' => ['nullable', 'boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($event->image_path) {
+                Storage::disk('public')->delete($event->image_path);
+            }
+            $file = $request->file('image');
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $validated['image_path'] = $file->storeAs('events', $filename, 'public');
+        } elseif ($request->boolean('remove_image') && $event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+            $validated['image_path'] = null;
+        }
+
+        unset($validated['image'], $validated['remove_image']);
 
         $updated = $this->events->update($event, $validated);
 
@@ -89,6 +115,10 @@ class EventController extends Controller
         $event = $this->events->find($id);
 
         Gate::authorize('delete', $event);
+
+        if ($event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
 
         $this->events->delete($event);
 
