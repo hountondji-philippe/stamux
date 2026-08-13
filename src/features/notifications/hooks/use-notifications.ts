@@ -19,16 +19,24 @@ interface NotificationsResponse {
 }
 
 async function fetchNotifications(): Promise<NotificationsResponse> {
-  const response = await apiClient.get<NotificationsResponse>('/notifications')
+  const response = await apiClient.get<NotificationsResponse>('/me/notifications')
   return response.data
 }
 
 async function markRead(id: string): Promise<void> {
-  await apiClient.patch(`/notifications/${id}/read`)
+  await apiClient.patch(`/me/notifications/${id}/read`)
 }
 
 async function markAllRead(): Promise<void> {
-  await apiClient.post('/notifications/read-all')
+  await apiClient.post('/me/notifications/read')
+}
+
+async function deleteOne(id: string): Promise<void> {
+  await apiClient.delete(`/me/notifications/${id}`)
+}
+
+async function deleteAll(): Promise<void> {
+  await apiClient.delete('/me/notifications')
 }
 
 function playNotificationSound() {
@@ -69,15 +77,12 @@ export function useNotifications() {
     lastUnreadCount.current = count
   }, [query.data?.data.unread_count])
 
-  const markReadMutation = useMutation({
-    mutationFn: markRead,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-  })
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['notifications'] })
 
-  const markAllReadMutation = useMutation({
-    mutationFn: markAllRead,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-  })
+  const markReadMutation = useMutation({ mutationFn: markRead, onSuccess: invalidate })
+  const markAllReadMutation = useMutation({ mutationFn: markAllRead, onSuccess: invalidate })
+  const deleteOneMutation = useMutation({ mutationFn: deleteOne, onSuccess: invalidate })
+  const deleteAllMutation = useMutation({ mutationFn: deleteAll, onSuccess: invalidate })
 
   return {
     notifications: query.data?.data.notifications ?? [],
@@ -85,5 +90,7 @@ export function useNotifications() {
     isLoading: query.isLoading,
     markRead: markReadMutation.mutate,
     markAllRead: markAllReadMutation.mutate,
+    deleteOne: deleteOneMutation.mutate,
+    deleteAll: deleteAllMutation.mutate,
   }
 }

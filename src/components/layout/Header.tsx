@@ -1,4 +1,4 @@
-import { LogOut, Sun, Moon, MessageCircle } from 'lucide-react'
+import { Menu, LogOut, Sun, Moon, MessageCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/auth-store'
 import { useThemeStore } from '../../store/theme-store'
@@ -6,7 +6,11 @@ import { roleLabels } from '../../lib/utils/role-labels'
 import { useUnreadCount } from '../../features/messaging/hooks/use-messaging'
 import { NotificationBell } from '../../features/notifications/components/NotificationBell'
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
   const clearAuth = useAuthStore((state) => state.clearAuth)
@@ -21,9 +25,16 @@ export function Header() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-surface px-6 dark:border-slate-800 dark:bg-slate-900">
-      <div />
-      <div className="flex items-center gap-4">
+    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-surface px-3 sm:px-6 dark:border-slate-800 dark:bg-slate-900">
+      <button
+        onClick={onMenuClick}
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/40 dark:text-slate-400 dark:hover:bg-slate-800 lg:hidden"
+        aria-label="Ouvrir le menu"
+      >
+        <Menu size={20} />
+      </button>
+      <div className="hidden lg:block" />
+      <div className="flex items-center gap-1 sm:gap-3">
         <button
           onClick={toggleTheme}
           className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 outline-none transition-colors hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/40 dark:text-slate-400 dark:hover:bg-slate-800"
@@ -44,11 +55,11 @@ export function Header() {
           )}
         </button>
         <NotificationBell />
-        <div className="flex items-center gap-2 border-l border-slate-200 pl-4 dark:border-slate-800">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-light text-sm font-semibold text-primary-dark">
+        <div className="flex items-center gap-2 border-l border-slate-200 pl-2 sm:pl-4 dark:border-slate-800">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-sm font-semibold text-primary-dark">
             {user?.name?.charAt(0).toUpperCase() ?? '?'}
           </div>
-          <div className="leading-tight">
+          <div className="hidden leading-tight sm:block">
             <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{user?.name}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {user ? roleLabels[user.role] : ''}

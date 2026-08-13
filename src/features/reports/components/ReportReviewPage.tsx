@@ -8,7 +8,6 @@ import { EmptyState } from '../../../components/ui/EmptyState'
 import { Badge } from '../../../components/ui/Badge'
 import { Button } from '../../../components/ui/Button'
 import { PageHeader } from '../../../components/ui/PageHeader'
-import { DataTable } from '../../../components/ui/DataTable'
 import { Avatar } from '../../../components/ui/Avatar'
 import { Card } from '../../../components/ui/Card'
 import { StatCard } from '../../../components/ui/StatCard'
@@ -62,7 +61,7 @@ function ReportDetailModal({ report, onClose }: { report: Report | null; onClose
         </Button>
 
         {report.mentor_comment && (
-          <div className="rounded-xl bg-slate-50 p-3.5 text-sm text-slate-600 dark:text-slate-400 dark:text-slate-500">
+          <div className="rounded-xl bg-slate-50 p-3.5 text-sm text-slate-600 dark:bg-slate-800/50 dark:text-slate-400">
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
               Commentaire
             </p>
@@ -108,6 +107,9 @@ function ReportDetailModal({ report, onClose }: { report: Report | null; onClose
                 Rejeter
               </Button>
             </div>
+            {!comment && (
+              <p className="text-xs text-slate-400">Le motif est obligatoire pour rejeter.</p>
+            )}
           </>
         )}
       </div>
@@ -117,7 +119,6 @@ function ReportDetailModal({ report, onClose }: { report: Report | null; onClose
 
 export function ReportReviewPage() {
   const { data, isLoading } = useReportHistory()
-  const { mutate: review } = useReviewReport()
   const { mutate: download } = useDownloadReport()
   const { mutate: remove } = useDeleteReport()
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]['key']>('all')
@@ -213,8 +214,8 @@ export function ReportReviewPage() {
                         <span className="font-medium text-slate-900 dark:text-slate-100">{r.intern?.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400 dark:text-slate-500">{typeLabels[r.type]}</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400 dark:text-slate-500">{r.period_end}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{typeLabels[r.type]}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">{r.period_end}</td>
                     <td className="px-4 py-3">
                       <Badge tone={statusTones[r.status]}>{statusLabels[r.status]}</Badge>
                     </td>
@@ -222,20 +223,20 @@ export function ReportReviewPage() {
                       <div className="flex justify-end gap-1">
                         <button
                           onClick={() => download(r.id)}
-                          className="rounded-lg p-2 text-slate-400 dark:text-slate-500 outline-none transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                          className="rounded-lg p-2 text-slate-400 outline-none transition-colors hover:bg-slate-100 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/40 dark:text-slate-500 dark:hover:bg-slate-800"
                           aria-label="Telecharger"
                         >
                           <Download size={15} />
                         </button>
                         {r.status === 'pending' ? (
                           <Button variant="primary" onClick={() => setSelectedReport(r)} className="!px-3 !py-1.5 text-xs">
-                            Valider
+                            Examiner
                           </Button>
                         ) : (
                           <>
                             <button
                               onClick={() => setSelectedReport(r)}
-                              className="rounded-lg p-2 text-slate-400 dark:text-slate-500 outline-none transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/40"
+                              className="rounded-lg p-2 text-slate-400 outline-none transition-colors hover:bg-slate-100 hover:text-primary focus-visible:ring-2 focus-visible:ring-primary/40 dark:text-slate-500 dark:hover:bg-slate-800"
                               aria-label="Consulter"
                             >
                               <Eye size={15} />

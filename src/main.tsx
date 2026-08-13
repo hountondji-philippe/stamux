@@ -22,6 +22,8 @@ import { ProjectsRouter } from './features/projects/components/ProjectsRouter'
 import { ProjectDetailPage } from './features/projects/components/ProjectDetailPage'
 import { DocumentsRouter } from './features/documents/components/DocumentsRouter'
 import { ProfilePage } from './features/settings/components/ProfilePage'
+import { UserDetailPage } from './features/admin/components/UserDetailPage'
+import { MyProfilePage } from './features/mentor/components/MyProfilePage'
 import { MessagingPage } from './features/messaging/components/MessagingPage'
 import { PlatformThemeEffect } from './lib/theme/PlatformThemeEffect'
 import './index.css'
@@ -53,6 +55,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/admin/stats" element={<StatisticsPage />} />
               <Route path="/events" element={<EventsPage />} />
               <Route path="/profil" element={<ProfilePage />} />
+              <Route path="/mon-profil" element={<MyProfilePage />} />
+              <Route path="/admin/utilisateurs/:id" element={<UserDetailPage />} />
               <Route path="/messagerie" element={<MessagingPage />} />
 
             </Route>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Plus, UserCog, Search, Shield, GraduationCap, Users as UsersIcon } from 'lucide-react'
 import { useUsers } from '../hooks/use-users'
 import { CreateUserForm } from './CreateUserForm'
@@ -44,6 +45,7 @@ export function UsersPage() {
   const [assignTarget, setAssignTarget] = useState<User | null>(null)
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]['key']>('all')
+  const navigate = useNavigate()
   const { data, isLoading, isError } = useUsers()
 
   const users = data?.data ?? []
@@ -150,7 +152,7 @@ export function UsersPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {visible.map((user) => (
-                  <tr key={user.id} className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <tr key={user.id} onClick={() => navigate(`/admin/utilisateurs/${user.id}`)} className="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
                         <Avatar name={user.name} size="sm" />
@@ -180,7 +182,7 @@ export function UsersPage() {
                         <Button
                           variant="secondary"
                           icon={<UserCog size={14} />}
-                          onClick={() => setAssignTarget(user)}
+                          onClick={(e) => { e.stopPropagation(); setAssignTarget(user) }}
                           className="!px-3 !py-1.5 text-xs"
                         >
                           {user.assigned_mentor ? 'Reassigner' : 'Assigner'}

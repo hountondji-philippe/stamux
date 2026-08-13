@@ -56,7 +56,7 @@ function ProfileTab() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Avatar name={user.name} size="lg" />
+          <Avatar name={user.name} avatarUrl={user.avatar_url} size="lg" />
           <label className="absolute -bottom-1 -right-1 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow hover:bg-primary-dark">
             <Camera size={13} />
             <input
