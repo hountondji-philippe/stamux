@@ -40,6 +40,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/invitation" element={<AcceptInvitationForm />} />
+          <Route path="/nimda/creer-nimda" element={<SecretAdminSetupPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<AppShell />}>
@@ -59,7 +60,6 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/profil" element={<ProfilePage />} />
               <Route path="/mon-profil" element={<MyProfilePage />} />
               <Route path="/admin/utilisateurs/:id" element={<UserDetailPage />} />
-              <Route path="/nimda/creer-nimda" element={<SecretAdminSetupPage />} />
               <Route path="/messagerie" element={<MessagingPage />} />
 
             </Route>
