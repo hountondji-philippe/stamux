@@ -12,6 +12,7 @@ import { useDirectory } from '../hooks/use-directory'
 import { useAuthStore } from '../../../store/auth-store'
 import { Avatar } from '../../../components/ui/Avatar'
 import { roleLabels } from '../../../lib/utils/role-labels'
+import type { Role } from '../../../types/user'
 
 function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
@@ -67,7 +68,7 @@ function NewMessageModal({ onClose, onStarted }: { onClose: () => void; onStarte
               <Avatar name={u.name} size="sm" />
               <div>
                 <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{u.name}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{roleLabels[u.role] ?? u.role}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{roleLabels[u.role as Role] ?? u.role}</p>
               </div>
             </button>
           ))}
@@ -391,7 +392,7 @@ export function MessagingPage() {
                   {activeConversation.participants[0]?.name ?? 'Utilisateur'}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {roleLabels[activeConversation.participants[0]?.role ?? ''] ?? ''}
+                  {roleLabels[(activeConversation.participants[0]?.role ?? '') as Role] ?? ''}
                 </p>
               </div>
             </div>

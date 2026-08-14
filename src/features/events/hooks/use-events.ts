@@ -51,7 +51,7 @@ function buildFormData(payload: Record<string, unknown>): FormData {
 
 async function createEvent(payload: CreateEventPayload): Promise<EventResponse> {
   if (payload.image) {
-    const formData = buildFormData(payload)
+    const formData = buildFormData(payload as unknown as Record<string, unknown>)
     const response = await apiClient.post<EventResponse>('/events', formData, {
       headers: { 'Content-Type': undefined },
     })
