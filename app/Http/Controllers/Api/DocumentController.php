@@ -31,7 +31,7 @@ class DocumentController extends Controller
         private DeleteRejectedDocumentAction $deleteRejectedAction,
         private EditRejectedDocumentAction $editRejectedAction,
         private DocumentRepositoryInterface $documents,
-        private InternshipRepositoryInterface $internships,
+        private InternshipRepositoryInterface$internships,
     ) {
     }
 
@@ -45,7 +45,7 @@ class DocumentController extends Controller
                 'success' => false,
                 'error' => [
                     'code' => 'NO_ACTIVE_INTERNSHIP',
-                    'message' => 'Aucun stage actif trouvé.',
+                    'message' => 'Aucun stageactif trouvé.',
                 ],
             ], 422);
         }
@@ -107,6 +107,13 @@ class DocumentController extends Controller
     {
         $document = $this->documents->find($id);
 
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
+
         Gate::authorize('mentorValidate', $document);
 
         $updated = $request->validated('status') === 'approved'
@@ -123,6 +130,13 @@ class DocumentController extends Controller
     {
         $document = $this->documents->find($id);
 
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
+
         Gate::authorize('processAsAdmin', \App\Models\Document::class);
 
         $updated = $this->adminProcessAction->upload($document, auth()->id(), $request->file('file'));
@@ -136,6 +150,13 @@ class DocumentController extends Controller
     public function reject(RejectDocumentRequest $request, string $id): JsonResponse
     {
         $document = $this->documents->find($id);
+
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
 
         Gate::authorize('processAsAdmin', \App\Models\Document::class);
 
@@ -155,6 +176,13 @@ class DocumentController extends Controller
     {
         $document = $this->documents->find($id);
 
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
+
         Gate::authorize('download', $document);
 
         if ($document->status !== \App\Enums\DocumentStatus::Completed || ! $document->file_path) {
@@ -172,6 +200,13 @@ class DocumentController extends Controller
     public function download(string $id): JsonResponse
     {
         $document = $this->documents->find($id);
+
+        if (! $document) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'DOCUMENT_NOT_FOUND', 'message' => 'Document introuvable.'],
+            ], 404);
+        }
 
         Gate::authorize('download', $document);
 

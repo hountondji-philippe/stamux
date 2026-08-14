@@ -14,6 +14,13 @@ class FileStorageService
         'image/png',
     ];
 
+    private const ALLOWED_EXTENSIONS = [
+        'pdf',
+        'jpg',
+        'jpeg',
+        'png',
+    ];
+
     private const MAX_FILE_SIZE_KB = 10240;
 
     public function store(UploadedFile $file, string $folder): string
@@ -29,6 +36,7 @@ class FileStorageService
     {
         $this->validateFile($file);
         $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
+
         return $file->storeAs($folder, $filename, 'public');
     }
 
@@ -61,12 +69,44 @@ class FileStorageService
 
     private function validateFile(UploadedFile $file): void
     {
+        $extension = strtolower((string) $file->getClientOriginalExtension());
+
+        if (! in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+            throw new \InvalidArgumentException('Extension de fichier non autorisée.');
+        }
+
         if (! in_array($file->getMimeType(), self::ALLOWED_MIME_TYPES, true)) {
             throw new \InvalidArgumentException('Type de fichier non autorisé.');
         }
 
         if ($file->getSize() > self::MAX_FILE_SIZE_KB * 1024) {
             throw new \InvalidArgumentException('Le fichier dépasse la taille maximale autorisée de 10 Mo.');
+        }
+
+        $realPath = $file->getRealPath();
+        if (! is_string($realPath) || ! is_file($realPath)) {
+            throw new \InvalidArgumentException('Le fichier uploadé est invalide.');
+        }
+
+        $contents = @file_get_contents($realPath);
+        if ($contents === false || $contents === '') {
+            throw new \InvalidArgumentException('Le fichier uploadé est vide ou illisible.');
+        }
+
+        $isPdf = str_starts_with($contents, '%PDF');
+        $isPng = str_starts_with($contents, "\x89PNG\r\n\x1a\n");
+        $isJpeg = str_starts_with($contents, "\xFF\xD8\xFF");
+
+        if ($extension === 'pdf' && ! $isPdf) {
+            throw new \InvalidArgumentException('Le fichier PDF est invalide.');
+        }
+
+        if (in_array($extension, ['png'], true) && ! $isPng) {
+            throw new \InvalidArgumentException('Le fichier PNG est invalide.');
+        }
+
+        if (in_array($extension, ['jpg', 'jpeg'], true) && ! $isJpeg) {
+            throw new \InvalidArgumentException('Le fichier image est invalide.');
         }
     }
 }

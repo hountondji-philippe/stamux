@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
@@ -15,7 +14,12 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     public function register(): void
     {
-        // Telescope::night();
+        // Telescope ne s'enregistre que si explicitement activé via .env
+        if (! env('TELESCOPE_ENABLED', false)) {
+            return;
+        }
+
+        Telescope::night();
 
         $this->hideSensitiveRequestDetails();
 
@@ -46,6 +50,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
             'cookie',
             'x-csrf-token',
             'x-xsrf-token',
+            'authorization',
         ]);
     }
 
@@ -56,9 +61,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewTelescope', function (User $user) {
+        Gate::define('viewTelescope', function ($user) {
             return in_array($user->email, [
-                //
+                'REMPLACE-PAR-TON-EMAIL-ADMIN@exemple.com',
             ]);
         });
     }

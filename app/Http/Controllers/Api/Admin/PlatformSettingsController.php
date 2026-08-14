@@ -54,7 +54,7 @@ class PlatformSettingsController extends Controller
         Gate::authorize('manage', \App\Models\User::class);
 
         $request->validate([
-            'logo' => ['required', 'image', 'mimes:png,jpg,jpeg,svg', 'max:1024'],
+            'logo' => ['required', 'image', 'mimes:png,jpg,jpeg', 'max:1024'],
         ]);
 
         $settings = PlatformSetting::current();
@@ -79,7 +79,7 @@ class PlatformSettingsController extends Controller
         Gate::authorize('manage', \App\Models\User::class);
 
         $request->validate([
-            'favicon' => ['required', 'image', 'mimes:png,jpg,jpeg,ico', 'max:512'],
+            'favicon' => ['required', 'image', 'mimes:png,jpg,jpeg', 'max:512'],
         ]);
 
         $settings = PlatformSetting::current();

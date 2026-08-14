@@ -32,6 +32,7 @@ class AuthController extends Controller
             $throttleKey
         );
 
+        $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -68,6 +69,58 @@ class AuthController extends Controller
         ]);
     }
 
+    public function setupAdmin(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $throttleKey = 'setup-admin:'.$request->ip();
+
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'TOO_MANY_ATTEMPTS', 'message' => 'Trop de tentatives. Réessayez plus tard.'],
+            ], 429);
+        }
+
+        $validated = $request->validate([
+            'token' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:10', 'confirmed'],
+        ]);
+
+        $expectedToken = config('app.admin_setup_token');
+
+        if (! $expectedToken || ! hash_equals((string) $expectedToken, $validated['token'])) {
+            \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 300);
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'FORBIDDEN', 'message' => 'Non autorisé.'],
+            ], 403);
+        }
+
+        \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
+
+        if (\App\Models\User::where('role', \App\Enums\UserRole::Admin->value)->exists()) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'ALREADY_CONFIGURED', 'message' => 'Un compte administrateur existe deja.'],
+            ], 403);
+        }
+
+        $user = \App\Models\User::create([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'role' => \App\Enums\UserRole::Admin->value,
+            'status' => \App\Enums\UserStatus::Active->value,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => ['message' => 'Compte administrateur créé avec succès.'],
+        ]);
+    }
+
     public function checkInvitation(string $token): JsonResponse
     {
         $hashedToken = hash('sha256', $token);
@@ -86,12 +139,21 @@ class AuthController extends Controller
         }
 
         return response()->json([
-    'success' => true,
-    'data' => [
-        'name' => $user->name,
-        'email' => $user->email,
-        'role' => $user->role,
-    ],
-]);
+            'success' => true,
+            'data' => [
+                'email' => $this->maskEmail($user->email),
+                'role' => $user->role,
+            ],
+        ]);
+    }
+
+    private function maskEmail(string $email): string
+    {
+        [$local, $domain] = explode('@', $email);
+
+        $visible = mb_substr($local, 0, 1);
+        $masked = $visible.str_repeat('*', max(mb_strlen($local) - 1, 1));
+
+        return $masked.'@'.$domain;
     }
 }

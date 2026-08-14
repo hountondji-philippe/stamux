@@ -29,12 +29,12 @@ class ReportController extends Controller
         private UpdateReportAction $updateReportAction,
         private HideReportAction $hideReportAction,
         private ReportRepositoryInterface $reports,
-        private InternshipRepositoryInterface $internships,
+        private InternshipRepositoryInterface$internships,
         private FileStorageService $fileStorage,
     ) {
     }
 
-    public function store(SubmitReportRequest $request): JsonResponse
+    public function store(SubmitReportRequest$request): JsonResponse
     {
         $user = auth()->user();
         $internship = $this->internships->findActiveByIntern($user->id);
@@ -44,7 +44,7 @@ class ReportController extends Controller
                 'success' => false,
                 'error' => [
                     'code' => 'NO_ACTIVE_INTERNSHIP',
-                    'message' => 'Aucun stage actif trouvé.',
+                    'message' => 'Aucun stageactif trouvé.',
                 ],
             ], 422);
         }
@@ -106,6 +106,13 @@ class ReportController extends Controller
     {
         $report = $this->reports->find($id);
 
+        if (! $report) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'REPORT_NOT_FOUND', 'message' => 'Rapport introuvable.'],
+            ], 404);
+        }
+
         Gate::authorize('view', $report);
 
         return response()->json([
@@ -117,6 +124,13 @@ class ReportController extends Controller
     public function update(UpdateReportRequest $request, string $id): JsonResponse
     {
         $report = $this->reports->find($id);
+
+        if (! $report) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'REPORT_NOT_FOUND', 'message' => 'Rapport introuvable.'],
+            ], 404);
+        }
 
         Gate::authorize('update', $report);
 
@@ -141,6 +155,13 @@ class ReportController extends Controller
     {
         $report = $this->reports->find($id);
 
+        if (! $report) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'REPORT_NOT_FOUND', 'message' => 'Rapport introuvable.'],
+            ], 404);
+        }
+
         Gate::authorize('delete', $report);
 
         $this->hideReportAction->execute($report, auth()->user());
@@ -154,6 +175,13 @@ class ReportController extends Controller
     public function validateReport(ValidateReportRequest $request, string $id): JsonResponse
     {
         $report = $this->reports->find($id);
+
+        if (! $report) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'REPORT_NOT_FOUND', 'message' => 'Rapport introuvable.'],
+            ], 404);
+        }
 
         Gate::authorize('validate', $report);
 
@@ -172,6 +200,13 @@ class ReportController extends Controller
     public function download(string $id): JsonResponse
     {
         $report = $this->reports->find($id);
+
+        if (! $report) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'REPORT_NOT_FOUND', 'message' => 'Rapport introuvable.'],
+            ], 404);
+        }
 
         Gate::authorize('download', $report);
 

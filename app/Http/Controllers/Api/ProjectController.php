@@ -16,7 +16,7 @@ use App\Http\Resources\ProjectResource;
 use App\Repositories\Contracts\ProjectRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate; // ← AJOUT
+use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
 {
@@ -63,7 +63,14 @@ class ProjectController extends Controller
     {
         $project = $this->projects->find($id);
 
-        Gate::authorize('view', $project); // ← REMPLACÉ
+        if (! $project) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'PROJECT_NOT_FOUND', 'message' => 'Projet introuvable.'],
+            ], 404);
+        }
+
+        Gate::authorize('view', $project);
 
         return response()->json([
             'success' => true,
@@ -75,7 +82,14 @@ class ProjectController extends Controller
     {
         $project = $this->projects->find($id);
 
-        Gate::authorize('update', $project); // ← REMPLACÉ
+        if (! $project) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'PROJECT_NOT_FOUND', 'message' => 'Projet introuvable.'],
+            ], 404);
+        }
+
+        Gate::authorize('update', $project);
 
         $validated = $request->validate([
             'title' => ['sometimes', 'string', 'max:255'],
@@ -97,7 +111,14 @@ class ProjectController extends Controller
     {
         $project = $this->projects->find($id);
 
-        Gate::authorize('assign', $project); // ← REMPLACÉ
+        if (! $project) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'PROJECT_NOT_FOUND', 'message' => 'Projet introuvable.'],
+            ], 404);
+        }
+
+        Gate::authorize('assign', $project);
 
         $updated = $this->assignProjectAction->execute(
             $project,
@@ -114,7 +135,14 @@ class ProjectController extends Controller
     {
         $project = $this->projects->find($id);
 
-        Gate::authorize('assign', $project); // ← REMPLACÉ
+        if (! $project) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'PROJECT_NOT_FOUND', 'message' => 'Projet introuvable.'],
+            ], 404);
+        }
+
+        Gate::authorize('assign', $project);
 
         $project->interns()->detach($internId);
 
@@ -128,7 +156,14 @@ class ProjectController extends Controller
     {
         $project = $this->projects->find($id);
 
-        Gate::authorize('update', $project); // ← REMPLACÉ
+        if (! $project) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'PROJECT_NOT_FOUND', 'message' => 'Projet introuvable.'],
+            ], 404);
+        }
+
+        Gate::authorize('update', $project);
 
         $validated = $request->validate([
             'progress' => ['required', 'integer', 'min:0', 'max:100'],
@@ -146,7 +181,14 @@ class ProjectController extends Controller
     {
         $project = $this->projects->find($id);
 
-        Gate::authorize('evaluate', $project); // ← REMPLACÉ
+        if (! $project) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'PROJECT_NOT_FOUND', 'message' => 'Projet introuvable.'],
+            ], 404);
+        }
+
+        Gate::authorize('evaluate', $project);
 
         $data = EvaluateInternData::fromArray(array_merge($request->validated(), [
             'intern_id' => $internId,

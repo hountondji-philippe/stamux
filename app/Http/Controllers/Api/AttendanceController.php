@@ -132,6 +132,8 @@ class AttendanceController extends Controller
 
     public function byIntern(string $internId): JsonResponse
     {
+        Gate::authorize('viewByIntern', [\App\Models\Attendance::class, $internId]);
+
         $attendances = $this->attendances->historyForIntern($internId);
 
         return response()->json([

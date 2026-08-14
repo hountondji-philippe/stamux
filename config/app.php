@@ -28,6 +28,8 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'admin_setup_token' => env('ADMIN_SETUP_TOKEN'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
