@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Send, Plus, X, Paperclip, Mic, Square, FileText, Download, Play, Pause } from 'lucide-react'
+import { Send, Plus, X, Paperclip, Mic, Square, FileText, Download, Play, Pause, ArrowLeft } from 'lucide-react'
 import {
   useConversations,
   useMessages,
@@ -91,10 +91,6 @@ function VoiceNotePlayer({ src, isMine }: { src: string; isMine: boolean }) {
     if (!audio) return
 
     const fixDuration = () => {
-      // Bug connu Chrome: les blobs MediaRecorder (webm) n'ont pas de duree
-      // dans leurs metadonnees -> audio.duration vaut Infinity. On force un
-      // seek loin puis un retour a 0 pour obliger le navigateur a calculer
-      // la vraie duree.
       if (audio.duration === Infinity || isNaN(audio.duration)) {
         audio.currentTime = 1e101
         const onTimeUpdateOnce = () => {
@@ -242,10 +238,12 @@ export function MessagingPage() {
   const audioChunksRef = useRef<Blob[]>([])
 
   const conversations = convData?.data ?? []
+  const hasAutoSelected = useRef(false)
 
   useEffect(() => {
-    if (!activeId && conversations.length > 0) {
+    if (!hasAutoSelected.current && !activeId && conversations.length > 0) {
       setActiveId(conversations[0].id)
+      hasAutoSelected.current = true
     }
   }, [conversations, activeId])
 
@@ -312,7 +310,11 @@ export function MessagingPage() {
 
   return (
     <div className="flex h-[calc(100vh-8rem)] gap-4">
-      <div className="flex w-72 shrink-0 flex-col rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-white/10">
+      <div
+        className={`${
+          activeConversation ? 'hidden md:flex' : 'flex'
+        } w-full shrink-0 flex-col rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-white/10 md:w-72`}
+      >
         <div className="flex items-center justify-between border-b border-slate-100 p-3 dark:border-slate-800">
           <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Messages</p>
           <button
@@ -362,7 +364,11 @@ export function MessagingPage() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-white/10">
+      <div
+        className={`${
+          activeConversation ? 'flex' : 'hidden md:flex'
+        } flex-1 flex-col rounded-2xl bg-white shadow-sm ring-1 ring-slate-900/5 dark:bg-slate-900 dark:ring-white/10`}
+      >
         {!activeConversation && (
           <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
             Selectionne une conversation ou demarre-en une nouvelle.
@@ -372,6 +378,13 @@ export function MessagingPage() {
         {activeConversation && (
           <>
             <div className="flex items-center gap-3 border-b border-slate-100 p-4 dark:border-slate-800">
+              <button
+                onClick={() => setActiveId(null)}
+                className="-ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 md:hidden"
+                aria-label="Retour aux conversations"
+              >
+                <ArrowLeft size={18} />
+              </button>
               <Avatar name={activeConversation.participants[0]?.name ?? '?'} size="sm" />
               <div>
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -390,7 +403,7 @@ export function MessagingPage() {
                 return (
                   <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`max-w-xs overflow-hidden rounded-2xl text-sm ${isMediaOnly ? '' : 'px-4 py-2'} ${
+                      className={`max-w-[85%] overflow-hidden rounded-2xl text-sm sm:max-w-xs ${isMediaOnly ? '' : 'px-4 py-2'} ${
                         isMine
                           ? 'bg-primary text-white'
                           : 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-100'
@@ -401,7 +414,7 @@ export function MessagingPage() {
                           <AttachmentBubble message={m} isMine={isMine} />
                         </div>
                       )}
-                      {m.body && <p className={isMediaOnly ? '' : ''}>{m.body}</p>}
+                      {m.body && <p>{m.body}</p>}
                       <p
                         className={`mt-1 text-[10px] ${isMine ? 'text-white/70' : 'text-slate-400'} ${
                           isMediaOnly ? 'px-2 pb-1' : ''

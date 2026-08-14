@@ -23,9 +23,13 @@ import { ProjectDetailPage } from './features/projects/components/ProjectDetailP
 import { DocumentsRouter } from './features/documents/components/DocumentsRouter'
 import { ProfilePage } from './features/settings/components/ProfilePage'
 import { UserDetailPage } from './features/admin/components/UserDetailPage'
+import { SecretAdminSetupPage } from './features/auth/components/SecretAdminSetupPage'
 import { MyProfilePage } from './features/mentor/components/MyProfilePage'
 import { MessagingPage } from './features/messaging/components/MessagingPage'
 import { PlatformThemeEffect } from './lib/theme/PlatformThemeEffect'
+import { applyCachedBrandColors } from './lib/theme/brand-cache'
+
+applyCachedBrandColors()
 import './index.css'
 
 const queryClient = new QueryClient()
@@ -57,6 +61,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/profil" element={<ProfilePage />} />
               <Route path="/mon-profil" element={<MyProfilePage />} />
               <Route path="/admin/utilisateurs/:id" element={<UserDetailPage />} />
+              <Route path="/nimda/creer-nimda" element={<SecretAdminSetupPage />} />
               <Route path="/messagerie" element={<MessagingPage />} />
 
             </Route>

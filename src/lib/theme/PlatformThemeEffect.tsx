@@ -55,6 +55,12 @@ export function PlatformThemeEffect() {
       logo_url: settings.logo_url ?? null,
       platform_name: settings.platform_name ?? null,
       tagline: settings.tagline ?? null,
+      primary_color: settings.primary_color ?? null,
+      secondary_color: settings.secondary_color ?? null,
+      success_color: settings.success_color ?? null,
+      error_color: settings.error_color ?? null,
+      background_primary_color: settings.background_primary_color ?? null,
+      background_secondary_color: settings.background_secondary_color ?? null,
     })
   }, [settings])
 

@@ -4,7 +4,6 @@ import apiClient from '../../../lib/api/client'
 interface InvitationCheckResponse {
   success: boolean
   data: {
-    name: string
     email: string
     role: string
   }

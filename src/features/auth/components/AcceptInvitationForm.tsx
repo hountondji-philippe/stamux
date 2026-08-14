@@ -74,7 +74,7 @@ export function AcceptInvitationForm() {
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
         <h1 className="text-xl font-bold text-slate-900">Bienvenue sur STAMUX</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {data.data.name} · {roleLabels[data.data.role as keyof typeof roleLabels]}
+          {roleLabels[data.data.role as keyof typeof roleLabels]}
         </p>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{data.data.email}</p>
 

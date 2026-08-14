@@ -174,11 +174,9 @@ export function useUploadAvatar() {
 }
 
 export function usePlatformSettings() {
-  const isAuthenticated = useAuthStore((state) => !!state.user)
   return useQuery({
     queryKey: ['platform-settings'],
     queryFn: fetchPlatformSettings,
-    enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000,
   })
 }
