@@ -1,8 +1,10 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+
 return new class extends Migration
 {
     public function up(): void
@@ -17,10 +19,14 @@ return new class extends Migration
         });
 
         if (Schema::hasColumn('permissions', 'date')) {
-            DB::table('permissions')->whereNull('start_date')->update([
-                'start_date' => DB::raw('`date`'),
-                'end_date' => DB::raw('`date`'),
-            ]);
+            DB::table('permissions')->whereNull('start_date')->orderBy('id')->chunkById(200, function ($rows) {
+                foreach ($rows as $row) {
+                    DB::table('permissions')->where('id', $row->id)->update([
+                        'start_date' => $row->date,
+                        'end_date' => $row->date,
+                    ]);
+                }
+            });
 
             Schema::table('permissions', function (Blueprint $table) {
                 $table->dropColumn('date');
@@ -34,7 +40,13 @@ return new class extends Migration
             $table->date('date')->nullable();
         });
 
-        DB::table('permissions')->update(['date' => DB::raw('`start_date`')]);
+        DB::table('permissions')->orderBy('id')->chunkById(200, function ($rows) {
+            foreach ($rows as $row) {
+                DB::table('permissions')->where('id', $row->id)->update([
+                    'date' => $row->start_date,
+                ]);
+            }
+        });
 
         Schema::table('permissions', function (Blueprint $table) {
             $table->dropColumn(['start_date', 'end_date']);

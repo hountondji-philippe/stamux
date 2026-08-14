@@ -28,3 +28,5 @@ Thumbs.db
 /coverage
 test_tinker.py
 structure.txt
+
+.env.mysql-backup

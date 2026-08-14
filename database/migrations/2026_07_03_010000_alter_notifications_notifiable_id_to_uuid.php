@@ -10,7 +10,9 @@ return new class extends Migration
     public function up(): void
     {
         // Convert numeric notifiable_id to UUID char(36)
-        DB::statement("ALTER TABLE `notifications` MODIFY `notifiable_id` CHAR(36) NOT NULL");
+        Schema::table('notifications', function (Blueprint $table) {
+            $table->char('notifiable_id', 36)->nullable(false)->change();
+        });
 
         // Ensure composite index exists for morph lookup
         Schema::table('notifications', function (Blueprint $table) {
@@ -24,6 +26,8 @@ return new class extends Migration
             $table->dropIndex('notifications_notifiable_type_id_index');
         });
 
-        DB::statement("ALTER TABLE `notifications` MODIFY `notifiable_id` BIGINT(20) UNSIGNED NOT NULL");
+        Schema::table('notifications', function (Blueprint $table) {
+            $table->unsignedBigInteger('notifiable_id')->change();
+        });
     }
 };
