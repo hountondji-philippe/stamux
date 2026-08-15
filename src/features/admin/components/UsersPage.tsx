@@ -140,8 +140,8 @@ export function UsersPage() {
         )}
 
         {!isLoading && !isError && visible.length > 0 && (
-          <div className="overflow-hidden rounded-xl ring-1 ring-slate-900/5">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl ring-1 ring-slate-900/5">
+            <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-slate-50/80 dark:bg-slate-800/50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-primary">
