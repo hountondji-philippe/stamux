@@ -53,6 +53,7 @@ const navByRole: Record<string, NavItem[]> = {
     { to: '/', label: 'Tableau de bord', icon: LayoutDashboard },
     { to: '/attendance', label: 'Mes presences', icon: ClipboardCheck },
     { to: '/permissions', label: 'Mes permissions', icon: FileClock },
+    { to: '/mon-stage', label: 'Mon stage', icon: CalendarClock },
     { to: '/reports', label: 'Mes rapports', icon: FileText },
     { to: '/projects', label: 'Mes projets', icon: FolderKanban },
     { to: '/documents', label: 'Mes documents', icon: FileStack },

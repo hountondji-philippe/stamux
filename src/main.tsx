@@ -11,6 +11,7 @@ import { DashboardPage } from './features/dashboard/components/DashboardPage'
 import { UsersPage } from './features/admin/components/UsersPage'
 import { PermissionsMatrixPage } from './features/admin/components/PermissionsMatrixPage'
 import { InternshipDateChangeAdminPage } from './features/internship-date-change/components/InternshipDateChangeAdminPage'
+import { MyInternshipPage } from './features/internship/components/MyInternshipPage'
 import { StatisticsPage } from './features/admin/components/StatisticsPage'
 import { AttendanceRouter } from './features/attendance/components/AttendanceRouter'
 import { PermissionRouter } from './features/permissions/components/PermissionRouter'
@@ -61,6 +62,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/events" element={<EventsPage />} />
               <Route path="/profil" element={<ProfilePage />} />
               <Route path="/mon-profil" element={<MyProfilePage />} />
+              <Route path="/mon-stage" element={<MyInternshipPage />} />
               <Route path="/admin/utilisateurs/:id" element={<UserDetailPage />} />
               <Route path="/messagerie" element={<MessagingPage />} />
 

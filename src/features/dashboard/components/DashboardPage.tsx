@@ -7,8 +7,7 @@ import { useAttendanceHistory } from '../../attendance/hooks/use-attendance'
 import { usePermissionHistory } from '../../permissions/hooks/use-permissions'
 import { useReportHistory } from '../../reports/hooks/use-reports'
 import { useProjects } from '../../projects/hooks/use-projects'
-import { InternshipFeedbackForm } from '../../feedback/components/InternshipFeedbackForm'
-import { InternshipDateChangeForm } from '../../internship-date-change/components/InternshipDateChangeForm'
+
 import {
   useAdminOverview,
   useAdminAttendanceStats,
@@ -308,8 +307,6 @@ function InternDashboard({ name }: { name: string }) {
         <WeeklyProgress projects={projects} />
       </div>
 
-      <InternshipDateChangeForm />
-      <InternshipFeedbackForm />
     </div>
   )
 }
