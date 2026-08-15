@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Mail, Star, FolderKanban } from 'lucide-react'
 import { useAdminUser, useAdminUserOverview, useRateUser, useCompleteInternship } from '../hooks/use-admin-user-detail'
+import { ConfirmDialog } from '../../../components/ui/ConfirmDialog'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { Card } from '../../../components/ui/Card'
 import { Avatar } from '../../../components/ui/Avatar'
@@ -59,6 +60,7 @@ export function UserDetailPage() {
   const { data: overviewData, isLoading: overviewLoading } = useAdminUserOverview(id ?? '')
   const { mutate: rate, isPending: isRating, error: rateError } = useRateUser(id ?? '')
   const { mutate: completeInternship, isPending: isCompleting, isSuccess: completeSuccess } = useCompleteInternship(id ?? '')
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false)
 
   const user = userData?.data
   const overview = overviewData?.data
@@ -127,15 +129,22 @@ export function UserDetailPage() {
                         variant="secondary"
                         className="w-full"
                         disabled={isCompleting}
-                        onClick={() => {
-                          if (window.confirm('Marquer ce stage comme termine ? Cela permettra au stagiaire de soumettre son evaluation de fin de stage.')) {
-                            completeInternship()
-                          }
-                        }}
+                        onClick={() => setShowCompleteConfirm(true)}
                       >
                         {isCompleting ? 'Traitement...' : 'Marquer le stage comme termine'}
                       </Button>
                     )}
+                    <ConfirmDialog
+                      open={showCompleteConfirm}
+                      title="Terminer le stage"
+                      message="Marquer ce stage comme termine ? Cela permettra au stagiaire de soumettre son evaluation de fin de stage."
+                      confirmLabel="Marquer comme termine"
+                      onConfirm={() => {
+                        completeInternship()
+                        setShowCompleteConfirm(false)
+                      }}
+                      onCancel={() => setShowCompleteConfirm(false)}
+                    />
                   </div>
                 )}
               </div>

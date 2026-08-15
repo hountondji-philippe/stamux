@@ -1,4 +1,6 @@
 import { Menu, LogOut, Sun, Moon, MessageCircle } from 'lucide-react'
+import { useState } from 'react'
+import { ConfirmDialog } from '../ui/ConfirmDialog'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/auth-store'
 import { useThemeStore } from '../../store/theme-store'
@@ -18,6 +20,8 @@ export function Header({ onMenuClick }: HeaderProps) {
   const toggleTheme = useThemeStore((state) => state.toggleTheme)
   const { data: unreadData } = useUnreadCount()
   const unread = unreadData?.data.unread ?? 0
+
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   const handleLogout = () => {
     clearAuth()
@@ -67,13 +71,22 @@ export function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
         <button
-          onClick={handleLogout}
+          onClick={() => setShowLogoutConfirm(true)}
           className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 outline-none transition-colors hover:bg-danger-light hover:text-danger focus-visible:ring-2 focus-visible:ring-primary/40 dark:text-slate-400"
           aria-label="Deconnexion"
         >
           <LogOut size={18} />
         </button>
       </div>
+      <ConfirmDialog
+        open={showLogoutConfirm}
+        title="Se deconnecter"
+        message="Es-tu sur de vouloir te deconnecter ?"
+        confirmLabel="Se deconnecter"
+        variant="danger"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </header>
   )
 }
