@@ -85,7 +85,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(Internship::class, 'intern_id')
             ->where('status', 'active')
-            ->latestOfMany();
+            ->latestOfMany('created_at');
     }
 
     public function internsAsMentor(): HasMany
