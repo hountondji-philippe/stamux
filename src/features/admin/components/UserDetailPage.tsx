@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Mail, Star, FolderKanban } from 'lucide-react'
-import { useAdminUser, useAdminUserOverview, useRateUser } from '../hooks/use-admin-user-detail'
+import { useAdminUser, useAdminUserOverview, useRateUser, useCompleteInternship } from '../hooks/use-admin-user-detail'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { Card } from '../../../components/ui/Card'
 import { Avatar } from '../../../components/ui/Avatar'
@@ -58,6 +58,7 @@ export function UserDetailPage() {
   const { data: userData, isLoading: userLoading } = useAdminUser(id ?? '')
   const { data: overviewData, isLoading: overviewLoading } = useAdminUserOverview(id ?? '')
   const { mutate: rate, isPending: isRating, error: rateError } = useRateUser(id ?? '')
+  const { mutate: completeInternship, isPending: isCompleting, isSuccess: completeSuccess } = useCompleteInternship(id ?? '')
 
   const user = userData?.data
   const overview = overviewData?.data
@@ -117,6 +118,26 @@ export function UserDetailPage() {
                     {user.status === 'active' ? 'Actif' : user.status}
                   </Badge>
                 </div>
+                {user.role === 'intern' && (
+                  <div className="mt-3">
+                    {completeSuccess ? (
+                      <p className="text-sm text-success">Stage marque comme termine.</p>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        disabled={isCompleting}
+                        onClick={() => {
+                          if (window.confirm('Marquer ce stage comme termine ? Cela permettra au stagiaire de soumettre son evaluation de fin de stage.')) {
+                            completeInternship()
+                          }
+                        }}
+                      >
+                        {isCompleting ? 'Traitement...' : 'Marquer le stage comme termine'}
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </Card>

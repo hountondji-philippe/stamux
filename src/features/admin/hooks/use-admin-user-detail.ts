@@ -59,3 +59,20 @@ export function useRateUser(id: string) {
     },
   })
 }
+
+async function completeInternship(id: string): Promise<{ success: boolean; data: { message: string } }> {
+  const response = await apiClient.post(`/admin/users/${id}/complete-internship`)
+  return response.data
+}
+
+export function useCompleteInternship(id: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => completeInternship(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users', id] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users', id, 'overview'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+    },
+  })
+}
