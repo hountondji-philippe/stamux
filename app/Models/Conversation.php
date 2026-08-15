@@ -26,6 +26,6 @@ class Conversation extends Model
 
     public function lastMessage()
     {
-        return $this->hasOne(Message::class)->latestOfMany('created_at');
+        return $this->hasOne(Message::class)->ofMany(['created_at' => 'max']);
     }
 }
