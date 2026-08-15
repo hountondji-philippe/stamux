@@ -7,6 +7,7 @@ use App\Actions\Intern\CreateInternAction;
 use App\Actions\Intern\TerminateInternshipAction;
 use App\DTOs\CreateInternData;
 use App\DTOs\CreateUserData;
+use App\Actions\Intern\CompleteInternshipAction;
 use App\DTOs\TerminateInternshipData;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
@@ -176,6 +177,27 @@ class AdminUserController extends Controller
         return response()->json([
             'success' => true,
             'data' => ['message' => 'Stage clôturé avec succès.'],
+        ]);
+    }
+
+    public function completeInternship(string $id): JsonResponse
+    {
+        Gate::authorize('manage', \App\Models\User::class);
+
+        $internship = $this->internships->findActiveByIntern($id);
+
+        if (! $internship) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'NO_ACTIVE_INTERNSHIP', 'message' => 'Aucun stage actif trouve.'],
+            ], 422);
+        }
+
+        app(\App\Actions\Intern\CompleteInternshipAction::class)->execute($internship);
+
+        return response()->json([
+            'success' => true,
+            'data' => ['message' => 'Stage marque comme termine avec succes.'],
         ]);
     }
 

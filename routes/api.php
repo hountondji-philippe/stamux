@@ -169,6 +169,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('{id}', 'destroy');
                 Route::post('{id}/assign-mentor', 'assignMentor');
                 Route::post('{id}/terminate', 'terminate');
+                Route::post('{id}/complete-internship', 'completeInternship');
                 Route::delete('{id}/purge', 'purge');
                 Route::post('{id}/resend-invitation', 'resendInvitation')->middleware('throttle:10,1');
             });
