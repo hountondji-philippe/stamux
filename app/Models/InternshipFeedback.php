@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InternshipFeedback extends Model
 {
+    protected $table = 'internship_feedbacks';
+
     use HasFactory, HasUuids;
 
     public $incrementing = false;
