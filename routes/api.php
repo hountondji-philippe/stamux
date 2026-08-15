@@ -91,6 +91,13 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/review', 'review');
         });
 
+        Route::prefix('internship-date-changes')->controller(\App\Http\Controllers\Api\InternshipDateChangeController::class)->group(function () {
+            Route::post('/', 'store');
+            Route::get('/', 'history');
+            Route::get('pending', 'pending');
+            Route::post('{id}/review', 'review');
+        });
+
         Route::prefix('reports')->controller(ReportController::class)->group(function () {
             Route::post('/', 'store');
             Route::get('/', 'index');
