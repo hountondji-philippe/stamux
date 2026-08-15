@@ -42,7 +42,7 @@ export function useResendInvitation() {
 }
 
 async function deleteUser(id: string) {
-  const response = await apiClient.delete(`/admin/users/${id}`)
+  const response = await apiClient.delete(`/admin/users/${id}/delete-intern-data`)
   return response.data
 }
 
