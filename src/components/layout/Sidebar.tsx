@@ -8,6 +8,7 @@ import {
   FolderKanban,
   FileStack,
   CalendarDays,
+  CalendarClock,
   Settings,
   Shield,
   FileClock,
@@ -36,6 +37,7 @@ const navByRole: Record<string, NavItem[]> = {
     { to: '/attendance', label: 'Presences', icon: ClipboardCheck },
     { to: '/reports', label: 'Rapports', icon: FileText },
     { to: '/admin/permissions', label: 'Permissions', icon: Lock },
+    { to: '/admin/demandes-dates', label: 'Demandes de dates', icon: CalendarClock },
     { to: '/admin/stats', label: 'Statistiques', icon: Shield },
   ],
   mentor: [

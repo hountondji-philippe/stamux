@@ -10,6 +10,7 @@ import { AppShell } from './components/layout/AppShell'
 import { DashboardPage } from './features/dashboard/components/DashboardPage'
 import { UsersPage } from './features/admin/components/UsersPage'
 import { PermissionsMatrixPage } from './features/admin/components/PermissionsMatrixPage'
+import { InternshipDateChangeAdminPage } from './features/internship-date-change/components/InternshipDateChangeAdminPage'
 import { StatisticsPage } from './features/admin/components/StatisticsPage'
 import { AttendanceRouter } from './features/attendance/components/AttendanceRouter'
 import { PermissionRouter } from './features/permissions/components/PermissionRouter'
@@ -47,6 +48,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/" element={<DashboardPage />} />
               <Route path="/admin/utilisateurs" element={<UsersPage />} />
               <Route path="/admin/permissions" element={<PermissionsMatrixPage />} />
+              <Route path="/admin/demandes-dates" element={<InternshipDateChangeAdminPage />} />
               <Route path="/attendance" element={<AttendanceRouter />} />
               <Route path="/permissions" element={<PermissionRouter />} />
               <Route path="/reports" element={<ReportRouter />} />
