@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, UserCog, Search, Shield, GraduationCap, Users as UsersIcon } from 'lucide-react'
-import { useUsers } from '../hooks/use-users'
+import { Plus, UserCog, Search, Shield, GraduationCap, Users as UsersIcon, Mail, Trash2 } from 'lucide-react'
+import { useUsers, useResendInvitation, useDeleteUser } from '../hooks/use-users'
 import { CreateUserForm } from './CreateUserForm'
 import { AssignMentorModal } from './AssignMentorModal'
 import { Modal } from '../../../components/ui/Modal'
@@ -47,6 +47,18 @@ export function UsersPage() {
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]['key']>('all')
   const navigate = useNavigate()
   const { data, isLoading, isError } = useUsers()
+  const resendInvitation = useResendInvitation()
+  const deleteUser = useDeleteUser()
+
+  const handleResend = (id: string) => {
+    resendInvitation.mutate(id)
+  }
+
+  const handleDelete = (id: string, name: string) => {
+    if (window.confirm(`Supprimer le compte de ${name} ? Cette action retirera le compte de la liste des utilisateurs actifs.`)) {
+      deleteUser.mutate(id)
+    }
+  }
 
   const users = data?.data ?? []
   const mentors = users.filter((u) => u.role === 'mentor' && u.status === 'active')
@@ -178,16 +190,38 @@ export function UsersPage() {
                       <Badge tone={statusTones[user.status]}>{statusLabels[user.status]}</Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      {user.role === 'intern' && (
-                        <Button
-                          variant="secondary"
-                          icon={<UserCog size={14} />}
-                          onClick={(e) => { e.stopPropagation(); setAssignTarget(user) }}
-                          className="!px-3 !py-1.5 text-xs"
-                        >
-                          {user.assigned_mentor ? 'Reassigner' : 'Assigner'}
-                        </Button>
-                      )}
+                      <div className="flex items-center justify-end gap-2">
+                        {user.status === 'pending' && (
+                          <Button
+                            variant="secondary"
+                            icon={<Mail size={14} />}
+                            onClick={(e) => { e.stopPropagation(); handleResend(user.id) }}
+                            className="!px-3 !py-1.5 text-xs"
+                          >
+                            Renvoyer
+                          </Button>
+                        )}
+                        {user.role === 'intern' && (
+                          <Button
+                            variant="secondary"
+                            icon={<UserCog size={14} />}
+                            onClick={(e) => { e.stopPropagation(); setAssignTarget(user) }}
+                            className="!px-3 !py-1.5 text-xs"
+                          >
+                            {user.assigned_mentor ? 'Reassigner' : 'Assigner'}
+                          </Button>
+                        )}
+                        {user.role !== 'admin' && (
+                          <Button
+                            variant="secondary"
+                            icon={<Trash2 size={14} />}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(user.id, user.name) }}
+                            className="!px-3 !py-1.5 text-xs !text-danger"
+                          >
+                            Supprimer
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
