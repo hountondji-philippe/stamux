@@ -17,7 +17,9 @@ use App\Policies\ReportPolicy;
 use App\Policies\TaskPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoApiTransport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,5 +36,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Document::class, DocumentPolicy::class);
         Gate::policy(Event::class, EventPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+
+        Mail::extend('brevo', function () {
+            return new BrevoApiTransport(config('services.brevo.key'));
+        });
     }
 }
