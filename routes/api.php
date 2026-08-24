@@ -170,6 +170,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('{id}/assign-mentor', 'assignMentor');
                 Route::post('{id}/terminate', 'terminate');
                 Route::post('{id}/complete-internship', 'completeInternship');
+                Route::delete('{id}/delete-intern-data', 'deleteInternData');
                 Route::delete('{id}/purge', 'purge');
                 Route::post('{id}/resend-invitation', 'resendInvitation')->middleware('throttle:10,1');
             });
@@ -204,3 +205,4 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+Route::get('/system/mark-absent', [\App\Http\Controllers\Api\SystemCronController::class, 'markAbsent']);

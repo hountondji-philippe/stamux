@@ -8,6 +8,7 @@ use App\Actions\Intern\TerminateInternshipAction;
 use App\DTOs\CreateInternData;
 use App\DTOs\CreateUserData;
 use App\Actions\Intern\CompleteInternshipAction;
+use App\Actions\Intern\DeleteInternDataAction;
 use App\DTOs\TerminateInternshipData;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
@@ -198,6 +199,27 @@ class AdminUserController extends Controller
         return response()->json([
             'success' => true,
             'data' => ['message' => 'Stage marque comme termine avec succes.'],
+        ]);
+    }
+
+    public function deleteInternData(string $id): JsonResponse
+    {
+        Gate::authorize('manage', \App\Models\User::class);
+
+        $user = $this->users->find($id);
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'error' => ['code' => 'USER_NOT_FOUND', 'message' => 'Utilisateur introuvable.'],
+            ], 404);
+        }
+
+        app(\App\Actions\Intern\DeleteInternDataAction::class)->execute($user);
+
+        return response()->json([
+            'success' => true,
+            'data' => ['message' => 'Compte supprime. L\'historique d\'evaluation du mentor a ete conserve.'],
         ]);
     }
 
